@@ -76,6 +76,7 @@ public:
 	FeSound* loadVoice(const std::string& folder, const char* sound);
 	void initVoices();
 	void initNextList();
+	void restoreNextList(int turns, int rngseed, bool checkRNG);
 	void playerSetup(FieldProp& properties, int playerNum, int playerTotal);
 	void setRandomSeed(unsigned long seedIn, PuyoRng**);
 

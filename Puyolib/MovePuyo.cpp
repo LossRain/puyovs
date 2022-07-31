@@ -1054,6 +1054,8 @@ void MovePuyo::move()
 			setFlipCounter(flipcounter);
 			m_player->m_scoreVal = scoreval;
 			m_player->m_controls.m_down = down;
+		} else {
+			m_player->restoreNextList(trns,0,false);
 		}
 
 		m_player->m_messages.pop_front();

@@ -439,6 +439,9 @@ void GameManager::channelMessageReceived(QString channel, uchar subchannel, QStr
 			}
 		} else {
 			qDebug("Passing %s", message.toUtf8().data());
+			qDebug("Current RNG %i",game->m_randomSeedNextList);
+			qDebug("DBG 1 %i - %i",game->m_players[0]->m_turns);
+			qDebug("DBG 2 %i - %i",game->m_players[1]->m_turns);
 			game->m_players[playernum]->addMessage(message.toUtf8().data());
 		}
 	}

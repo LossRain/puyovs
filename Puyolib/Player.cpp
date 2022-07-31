@@ -349,18 +349,9 @@ void Player::initValues(int randomSeed)
 	// Initialize or override values according to ruleset
 	m_currentGame->m_currentRuleSet->onInit(this);
 
-	// Add 4 initial 3-colored puyo
-	initNextList();
-	m_turns = 0;
 	m_waitForConfirm = 0;
 	m_loseConfirm = false;
 
-	// Set next puyo
-	if (m_useDropPattern) {
-		m_nextPuyo.update(m_nextList, m_character, 0);
-	} else {
-		m_nextPuyo.update(m_nextList, ARLE, 0);
-	}
 
 	// Idle
 	m_currentPhase = Phase::IDLE;
@@ -379,6 +370,24 @@ void Player::initNextList()
 	checkAllClearStart();
 	addNewColorPair(m_colors);
 	m_turns = 0;
+}
+
+void Player::restoreNextList(int turns, int rngseed, bool checkRNG)
+{
+	// Restore NextListRNG while spectating
+	int turns_missed = turns - m_turns;
+	if (turns_missed) { //Already on track
+		if (turns_missed - 6 || (checkRNG && rngseed != m_currentGame->m_randomSeedNextList)) { // We are too forward
+			m_currentGame->m_randomSeedNextList = rngseed;
+			initNextList();
+		} 
+		for (int i = 0; i < max(0,turns - m_turns + 1); i++) {
+			// Push and remove as many pairs as we have missed
+			addNewColorPair(m_colors);
+			popColor();
+		}
+		m_turns = turns; //We are now synchronised
+	}
 }
 
 void Player::checkAllClearStart()
@@ -2489,7 +2498,8 @@ void Player::getUpdate(std::string str)
 	sscanf(str.c_str(), "spectate|%i|%s |%i|%s |%i|%i|%i|%i|%i|%i|%i|%i|%i|%i|%i|%i|", &ph, fieldstring, &fm, feverstring, &fc, &rngseed, &rngcalled, &trns, &clrs, &mrgntmr, &chn, &crntfvrchn, &nGQ, &fGQ, &prdctchn, &allclr);
 
 	// Initialize
-	setRandomSeed(rngseed, &m_rngNextList);
+	// setRandomSeed(rngseed, &m_rngNextList); // Deprecated by InitNextList()
+	//m_currentGame->m_randomSeedNextList  = rngseed;
 	m_colors = clrs;
 	initValues(static_cast<int>(rngseed + m_onlineId));
 
@@ -2507,13 +2517,24 @@ void Player::getUpdate(std::string str)
 		getRandom(0, m_rngFeverChain);
 		getRandom(0, m_rngFeverColor);
 	}
-	m_turns = trns;
 
-	// Call nextlist random
-	for (int i = 0; i < m_turns; i++) {
-		getRandom(0, m_rngNextList);
-		getRandom(0, m_rngNextList);
+	
+	// TODO: Make RNG regeneration much more performant and utilise caching
+
+	// Cycles the Next Queue until synchronised with others
+	// FIX: When a spectator joins mid-game, it puts the default
+	// Puyo pair as the first drop per board. Correctly synchronise the
+	// first drop instead of skipping it unlike this for loop.
+	
+
+	restoreNextList(trns,rngseed,true); // Puyo pairs the player has already dropped
+
+	if (m_useDropPattern) {
+		m_nextPuyo.update(m_nextList, m_character, 0);
+	} else {
+		m_nextPuyo.update(m_nextList, ARLE, 0);
 	}
+
 	m_marginTimer = mrgntmr;
 	m_chain = chn;
 	m_predictedChain = prdctchn;
