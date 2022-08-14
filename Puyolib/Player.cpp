@@ -4,6 +4,7 @@
 #include "RNG/PuyoRng.h"
 #include <algorithm>
 #include <cmath>
+#include <string>
 
 using namespace std;
 
@@ -136,7 +137,8 @@ Player::Player(const PlayerType type, const int playerNum, const int totalPlayer
 	m_fieldSprite.setCenterBottom();
 	m_fieldFeverSprite.setCenterBottom();
 
-	// Initialize character animation object
+	// Initialize character animation and voice object
+	m_skinString = "";
 	setCharacter(m_character);
 	m_pickingCharacter = false;
 
@@ -417,7 +419,7 @@ FeSound* Player::loadVoice(const std::string& folder, const char* sound)
 
 void Player::initVoices()
 {
-	const std::string currentCharacter = m_currentGame->m_settings->characterSetup[getCharacter()];
+	std::string currentCharacter = m_skinString.empty() ? m_currentGame->m_settings->characterSetup[m_character] : m_skinString;
 	const std::string folder = kFolderUserCharacter + currentCharacter + std::string("/Voice/");
 	m_characterVoices.chain[0].setBuffer(loadVoice(folder, "chain1.wav"));
 	m_characterVoices.chain[1].setBuffer(loadVoice(folder, "chain2.wav"));
@@ -542,7 +544,9 @@ void Player::setCharacter(PuyoCharacter character, bool show)
 	const PosVectorFloat offset(
 		m_activeField->getProperties().centerX * 1,
 		m_activeField->getProperties().centerY / 2.0f * 1);
-	const std::string currentCharacter = m_currentGame->m_settings->characterSetup[character];
+	
+	std::string currentCharacter = m_skinString.empty() ? m_currentGame->m_settings->characterSetup[character] : m_skinString;
+
 	if (m_currentGame->m_players.size() <= 10)
 		m_characterAnimation.init(m_data, offset, 1, kFolderUserCharacter + currentCharacter + std::string("/Animation/"));
 	else
@@ -553,7 +557,7 @@ void Player::setCharacter(PuyoCharacter character, bool show)
 	if (!show)
 		return;
 
-	m_currentCharacterSprite.setImage(m_data->front->loadImage((kFolderUserCharacter + m_currentGame->m_settings->characterSetup[character] + "/icon.png").c_str()));
+	m_currentCharacterSprite.setImage(m_data->front->loadImage((kFolderUserCharacter + currentCharacter + "/icon.png").c_str()));
 	m_currentCharacterSprite.setCenter();
 	m_currentCharacterSprite.setPosition(m_charHolderSprite.getPosition() + PosVectorFloat(1, 1) - PosVectorFloat(2, 4)); // Correct for shadow
 	m_currentCharacterSprite.setVisible(true);
@@ -566,9 +570,23 @@ void Player::setCharacter(PuyoCharacter character, bool show)
 	setDropSetSprite(static_cast<int>(m_currentCharacterSprite.getX()), static_cast<int>(m_currentCharacterSprite.getY() + 60.f * m_globalScale), m_character);
 }
 
+void Player::setSkinString(std::string skinString)
+{
+	m_skinString = skinString;
+}
+
 void Player::setFieldImage(PuyoCharacter character)
 {
-	FeImage* im = m_data->imgCharField[static_cast<unsigned char>(character)];
+	FeImage* im;
+	if (m_skinString.empty()) {
+		// No skin, load default character
+		im = m_data->imgCharField[static_cast<unsigned char>(character)];
+	} else {
+		// Skins are optional, if one decides to use them, the function should bear the
+		// responsibility of loading their own backgrounds. We couldn't feasibly include
+		// all skins in the "static" GameData struct.
+		im = m_data->front->loadImage(kFolderUserCharacter + m_skinString + "/field.png");
+	};
 	if (!im || im->error()) {
 		m_fieldSprite.setImage(m_playerNum == 1 ? m_data->imgField1 : m_data->imgField2);
 	} else {

@@ -490,6 +490,10 @@ void GameManager::peerChannelMessageReceived(QString channel, uchar subchannel, 
 			game->m_players[playernum]->m_rematch = true;
 			game->m_players[playernum]->m_rematchIcon.setVisible(true);
 			game->m_players[playernum]->m_rematchIconTimer = 0;
+		
+		// Update current character skin
+		std::string skinstr = items.at(4).toStdString();
+		game->m_players[playernum]->setSkinString(skinstr);
 		}
 
 		// Update wins

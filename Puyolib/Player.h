@@ -146,6 +146,7 @@ public:
 	void setLose();
 
 	// Draw code
+	void setSkinString(std::string skinString);
 	void draw();
 	void drawEffect();
 	void drawFieldBack(PosVectorFloat position, float rotation);
@@ -263,6 +264,7 @@ public:
 	int m_calledRandomFeverChain = 0;
 	bool m_forceStatusText = false;
 	void prepareDisconnect();
+	std::string m_skinString;
 
 	int m_waitForConfirm = 0;
 	void confirmGarbage();
