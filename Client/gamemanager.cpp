@@ -498,7 +498,12 @@ void GameManager::peerChannelMessageReceived(QString channel, uchar subchannel, 
 		game->m_players[playernum]->m_wins = wins;
 	} else if (items.at(0) == "spectate") {
 		// Update player
-		game->m_players[playernum]->getUpdate(message.toUtf8().data());
+		game->m_players[playernum]->getUpdate(message.toUtf8().data(), playernum);
+		// We found the base RNG player
+		if (game->checkLowestId(playernum)) {
+			game->resetPlayersWhileSpectating(playernum);
+		}
+
 	} else {
 		// Pass to player
 		if (subchannel == CHANNEL_GAME)

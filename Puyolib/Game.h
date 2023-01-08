@@ -78,6 +78,7 @@ public:
 	void checkEnd();
 	void addPlayer(PlayerType type, int playerNum, int numPlayers);
 	void resetPlayers();
+	void resetPlayersWhileSpectating(int lowest_num);
     [[nodiscard]] int getActivePlayers() const;
 
 	// Online
@@ -90,6 +91,7 @@ public:
     [[nodiscard]] int countBoundPlayers() const;
 	bool m_stopChaining = false; // Set true to stop all players from chaining
     [[nodiscard]] bool checkLowestId() const;
+	[[nodiscard]] bool checkLowestId(int player_num) const;
 	void sendDescription() const;
     [[nodiscard]] std::string sendUpdate() const; // Send the state of player 1 to update spectators
 	int m_choiceTimer = 0;

@@ -862,6 +862,26 @@ void Game::resetPlayers()
 	loadMusic();
 }
 
+void Game::resetPlayersWhileSpectating(int lowest_num) {
+	/* We need this helper when we get spectate packet from the player with the lowest ID
+	 * so that we can regenerate everybody's RNG while spectating */
+	m_data->matchTimer = 0;
+	for (size_t j = 0; j < m_players.size(); j++)  {
+		m_players[j]->setRandomSeed(m_players[lowest_num]->m_proposedRandomSeed, &(m_players[j]->m_rngNextGenerator));
+		/*setRandomSeed(m_randomSeedFever, &m_rngFeverChain);
+		setRandomSeed(m_randomSeedFever + 1, &m_rngFeverColor);*/
+		for (int i = 0; i < m_players[j]->m_calledRandomFeverChain; i++) {
+			m_players[j]->getRandom(0, m_players[j]->m_rngFeverChain);
+			m_players[j]->getRandom(0, m_players[j]->m_rngFeverColor);
+		}
+		for (int i = 0; i < m_players[j]->m_turns+3; i++) {
+			m_players[j]->getRandom(m_players[j]->m_colors,m_players[j]->m_rngNextGenerator);
+			m_players[j]->getRandom(m_players[j]->m_colors, m_players[j]->m_rngNextGenerator);
+		}
+	}
+
+}
+
 // Check if match has ended.
 void Game::checkEnd()
 {
@@ -963,6 +983,22 @@ bool Game::checkLowestId() const
 	for (size_t i = 1; i < m_players.size(); i++) {
 		// If another player has a higher ID, we are not the lowest.
 		if (m_players[i]->m_active && m_players[i]->m_onlineId > m_players[0]->m_onlineId) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool Game::checkLowestId(int player_num) const
+{
+	// Check if active player has the lowest ID
+	if (!m_connected) {
+		return false;
+	}
+
+	for (size_t i = 1; i < m_players.size(); i++) {
+		// If another player has a lower ID, we are not the lowest.
+		if ((m_players[i]->m_active || m_players[i]->m_prepareActive) && m_players[i]->m_onlineId < m_players[player_num]->m_onlineId) {
 			return false;
 		}
 	}

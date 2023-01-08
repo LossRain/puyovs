@@ -18,7 +18,7 @@ Player::Player(const PlayerType type, const int playerNum, const int totalPlayer
 	m_debug = 0;
 	m_debugCounter = 0;
 
-	m_rngNextList = nullptr;
+	m_rngNextGenerator = nullptr;
 	m_rngFeverChain = nullptr;
 	m_rngFeverColor = nullptr;
 	m_rngNuisanceDrop = new MersenneTwister();
@@ -370,7 +370,7 @@ void Player::initValues(int randomSeed)
 
 void Player::initNextList()
 {
-	setRandomSeed(m_currentGame->m_randomSeedNextList, &m_rngNextList);
+	setRandomSeed(m_currentGame->m_randomSeedNextList, &m_rngNextGenerator);
 	m_nextList.clear();
 
 	// nextList needs 3 pairs to start
@@ -1722,8 +1722,8 @@ void Player::endGarbage()
 // Adds 2 new colors to nextlist and update nextpuyo
 void Player::addNewColorPair(int n)
 {
-	int color1 = this->getRandom(n, m_rngNextList);
-	int color2 = this->getRandom(n, m_rngNextList);
+	int color1 = this->getRandom(n, m_rngNextGenerator);
+	int color2 = this->getRandom(n, m_rngNextGenerator);
 
 	// Perform TGM randomizer algorithm?
 	if (m_currentGame->m_legacyRng) {
@@ -1736,7 +1736,7 @@ void Player::addNewColorPair(int n)
 	// Regenerate color 2 if type is quadruple and colors are the same
 	if (m_useDropPattern) {
 		while (color1 == color2 && getFromDropPattern(m_character, m_turns + 3) == MovePuyoType::QUADRUPLET) {
-			color2 = this->getRandom(n, m_rngNextList);
+			color2 = this->getRandom(n, m_rngNextGenerator);
 		}
 	}
 	m_nextList.push_back(color2);
@@ -1762,7 +1762,7 @@ int Player::TGMR(int color, int n)
 	if (m_nextList.size() >= 4) {
 		for (auto i = m_nextList.begin(); i != m_nextList.begin() + 4; ++i) {
 			if (*i == color) {
-				color = this->getRandom(n, m_rngNextList);
+				color = this->getRandom(n, m_rngNextGenerator);
 				break;
 			}
 		}
@@ -1967,7 +1967,7 @@ void Player::checkFever()
 		// No fever mode
 		// All clear bonus: drop a 4 chain
 		if (m_allClear == 1) {
-			m_activeField->dropField(getFeverChain(getRandom(m_currentGame->m_currentRuleSet->m_nFeverChains, m_rngNextList), m_colors, 4, getRandom(m_colors, m_rngFeverColor)));
+			m_activeField->dropField(getFeverChain(getRandom(m_currentGame->m_currentRuleSet->m_nFeverChains, m_rngNextGenerator), m_colors, 4, getRandom(m_colors, m_rngFeverColor)));
 			m_forgiveGarbage = true;
 			m_allClearTimer = 1;
 			if (m_feverGauge.m_seconds < 60 * m_feverGauge.m_maxSeconds) {
@@ -2480,7 +2480,7 @@ void Player::waitLose()
 	m_messages.pop_front();
 }
 
-void Player::getUpdate(std::string str)
+void Player::getUpdate(std::string str, int peer_num)
 {
 	char fieldstring[500] = {};
 	char feverstring[500] = {};
@@ -2504,11 +2504,10 @@ void Player::getUpdate(std::string str)
 	int fGQ = 0;
 	sscanf(str.c_str(), "spectate|%i|%s |%i|%s |%i|%i|%i|%i|%i|%i|%i|%i|%i|%i|%i|%i|", &ph, fieldstring, &fm, feverstring, &fc, &rngseed, &rngcalled, &trns, &clrs, &mrgntmr, &chn, &crntfvrchn, &nGQ, &fGQ, &prdctchn, &allclr);
 
-	// Initialize
-	setRandomSeed(rngseed, &m_rngNextList);
+	// Set random seed to proposed random seed
+	m_proposedRandomSeed = rngseed;
 	m_colors = clrs;
-	initValues(static_cast<int>(rngseed + m_onlineId));
-
+	initValues(static_cast<int>(m_currentGame->m_randomSeedNextList + m_onlineId));
 	// Set other stuff
 	m_currentPhase = static_cast<Phase>(ph);
 	m_fieldNormal.setFieldFromString(fieldstring);
@@ -2519,17 +2518,20 @@ void Player::getUpdate(std::string str)
 	m_feverGarbage.gq = fGQ;
 	updateTray();
 	m_calledRandomFeverChain = rngcalled;
-	for (int i = 0; i < rngcalled; i++) {
+/*	for (int i = 0; i < rngcalled; i++) {
 		getRandom(0, m_rngFeverChain);
 		getRandom(0, m_rngFeverColor);
-	}
+	}*/
 	m_turns = trns;
 
 	// Call nextlist random
-	for (int i = 0; i < m_turns; i++) {
-		getRandom(0, m_rngNextList);
-		getRandom(0, m_rngNextList);
+	/*for (int i = 0; i < m_turns; i++) {
+		getRandom(clrs, m_rngNextGenerator);
+		getRandom(clrs, m_rngNextGenerator);
 	}
+	for (int i = 0; i < m_turns; i++) {
+		popColor();
+	};*/
 	m_marginTimer = mrgntmr;
 	m_chain = chn;
 	m_predictedChain = prdctchn;
@@ -2557,6 +2559,9 @@ void Player::getUpdate(std::string str)
 		m_normalTray.align(m_activeField->getProperties().offsetX - 16 * m_globalScale, m_activeField->getProperties().offsetY - (32 + 16) * m_globalScale, m_globalScale);
 		m_normalTray.setDarken(true);
 	}
+
+	// HACK: Hangs otherwise
+	m_prepareActive = true;
 }
 
 void Player::prepareDisconnect()

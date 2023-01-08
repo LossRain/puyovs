@@ -259,7 +259,7 @@ public:
 	Sprite m_rematchIcon;
 	int m_rematchIconTimer = 0;
 	bool m_loseConfirm = false;
-	void getUpdate(std::string str);
+	void getUpdate(std::string str, int peer_num);
 	int m_calledRandomFeverChain = 0;
 	bool m_forceStatusText = false;
 	void prepareDisconnect();
@@ -276,9 +276,13 @@ public:
 	void setStatusText(const char* utf8);
 
 	// Debugging
-	int m_debug = 0;
+	int m_debug = 1;
 
 	std::vector<MessageEvent> m_recordMessages;
+
+	PuyoRng* m_rngNextGenerator = nullptr;
+	PuyoRng* m_rngFeverChain = nullptr;
+	PuyoRng* m_rngFeverColor = nullptr;
 
 private:
 	void processMessage();
@@ -299,9 +303,7 @@ private:
 	int m_allClearTimer = 0;
 	float m_transformScale = 0.f;
 
-	PuyoRng* m_rngNextList = nullptr;
-	PuyoRng* m_rngFeverChain = nullptr;
-	PuyoRng* m_rngFeverColor = nullptr;
+
 	MersenneTwister* m_rngNuisanceDrop = nullptr;
 	std::vector<int> m_nuisanceList;
 	int m_playerNum = 0;

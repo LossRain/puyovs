@@ -1054,8 +1054,8 @@ void MovePuyo::move()
 			setFlipCounter(flipcounter);
 			m_player->m_scoreVal = scoreval;
 			m_player->m_controls.m_down = down;
+			m_player->m_turns = trns;
 		}
-
 		m_player->m_messages.pop_front();
 		setSprite();
 	}
