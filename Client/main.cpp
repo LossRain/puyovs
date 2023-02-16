@@ -70,11 +70,11 @@ int main(int argc, char* argv[])
 	if (applicationDir.exists("puyovs.conf")) {
 		QDir::setCurrent(binPath);
 		QSettings settings("puyovs.conf", QSettings::IniFormat);
-		if (settings.contains("paths/bin")) {
-			binPath = settings.value("paths/bin").toString();
+		if (settings.contains("Paths/Bin")) {
+			binPath = settings.value("Paths/Bin").toString();
 		}
-		if (settings.contains("paths/assets")) {
-			assetsPath = settings.value("paths/assets").toString();
+		if (settings.contains("Paths/Assets")) {
+			assetsPath = settings.value("Paths/Assets").toString();
 		}
 	}
 
