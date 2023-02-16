@@ -2516,7 +2516,7 @@ void Player::getUpdate(std::string str)
 	// Set other stuff
 	m_currentPhase = static_cast<Phase>(ph);
 	m_fieldNormal.setFieldFromString(fieldstring);
-	m_feverMode = fm == 0 ? false : true;
+	m_feverMode = fm != 0;
 	m_fieldFever.setFieldFromString(feverstring);
 	m_feverGauge.setCount(fc);
 	m_normalGarbage.gq = nGQ;
