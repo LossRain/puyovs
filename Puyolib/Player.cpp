@@ -582,6 +582,21 @@ void Player::setFieldImage(PuyoCharacter character)
 		m_fieldSprite.setFlipX(true);
 	}
 }
+void Player::setSkin(std::string folder)
+{
+	m_currentGame->loadCharacterImages(static_cast<int>(m_character),folder);
+	initVoices(folder+"Voice/");
+	const PosVectorFloat offset(
+		m_activeField->getProperties().centerX * 1,
+		m_activeField->getProperties().centerY / 2.0f * 1);
+	const std::string currentCharacter = m_currentGame->m_settings->characterSetup[m_character];
+	if (m_currentGame->m_players.size() <= 10)
+		m_characterAnimation.init(m_data, offset, 1, folder + std::string("Animation/"));
+	else
+		m_characterAnimation.init(m_data, offset, 1, "");
+	m_currentCharacterSprite.setImage(m_data->front->loadImage((folder + "/icon.png").c_str()));
+
+}
 
 // Game code
 void Player::play()

@@ -92,6 +92,7 @@ public:
 	void setFieldImage(PuyoCharacter character);
 	[[nodiscard]] Field* getNormalField() { return &m_fieldNormal; }
 	[[nodiscard]] Field* getFeverField() { return &m_fieldFever; }
+	void setSkin(std::string folder);
 
 	// Garbage
 	void updateTray(const GarbageCounter* c = nullptr);
