@@ -415,10 +415,8 @@ FeSound* Player::loadVoice(const std::string& folder, const char* sound)
 	return m_data->front->loadSound((folder + sound).c_str());
 }
 
-void Player::initVoices()
+void Player::initVoices(const std::string& folder)
 {
-	const std::string currentCharacter = m_currentGame->m_settings->characterSetup[getCharacter()];
-	const std::string folder = kFolderUserCharacter + currentCharacter + std::string("/Voice/");
 	m_characterVoices.chain[0].setBuffer(loadVoice(folder, "chain1.wav"));
 	m_characterVoices.chain[1].setBuffer(loadVoice(folder, "chain2.wav"));
 	m_characterVoices.chain[2].setBuffer(loadVoice(folder, "chain3.wav"));
@@ -439,6 +437,12 @@ void Player::initVoices()
 	m_characterVoices.feverFail.setBuffer(loadVoice(folder, "feverfail.wav"));
 	m_characterVoices.lose.setBuffer(loadVoice(folder, "lose.wav"));
 	m_characterVoices.win.setBuffer(loadVoice(folder, "win.wav"));
+}
+void Player::initCharacterVoices()
+{
+	const std::string currentCharacter = m_currentGame->m_settings->characterSetup[getCharacter()];
+	const std::string folder = kFolderUserCharacter + currentCharacter + std::string("/Voice/");
+	initVoices(folder);
 }
 
 void Player::playerSetup(FieldProp& properties, const int playerNum, const int playerTotal)
@@ -538,7 +542,7 @@ int Player::getRandom(const int in, PuyoRng* rng)
 void Player::setCharacter(PuyoCharacter character, bool show)
 {
 	m_character = character;
-	initVoices();
+	initCharacterVoices();
 	const PosVectorFloat offset(
 		m_activeField->getProperties().centerX * 1,
 		m_activeField->getProperties().centerY / 2.0f * 1);

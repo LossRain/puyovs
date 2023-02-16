@@ -140,6 +140,9 @@ public:
 	void changeMusicVolume();
 	void loadMusic();
 
+	// Asset reloading
+	void loadCharacterImages(int i, const std::string& full_path) const;
+
 private:
 	// Main loop
 	void loop();

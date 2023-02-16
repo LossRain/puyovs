@@ -74,7 +74,8 @@ public:
 	void reset();
 	void initValues(int randomSeed);
 	FeSound* loadVoice(const std::string& folder, const char* sound);
-	void initVoices();
+	void initVoices(const std::string& folder);
+	void initCharacterVoices();
 	void initNextList();
 	void playerSetup(FieldProp& properties, int playerNum, int playerTotal);
 	void setRandomSeed(unsigned long seedIn, PuyoRng**);

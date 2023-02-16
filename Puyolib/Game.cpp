@@ -232,24 +232,27 @@ void Game::loadImages() const
 	m_data->imgWin = m_data->front->loadImage(m_baseAssetDir + kFolderUserBackgrounds + m_data->gUserSettings.backgroundDirPath + std::string("/win.png"));
 	m_data->imgFeverGauge = m_data->front->loadImage(m_baseAssetDir + kFolderUserBackgrounds + m_data->gUserSettings.backgroundDirPath + std::string("/fgauge.png"));
 	m_data->imgSeconds = m_data->front->loadImage(m_baseAssetDir + kFolderUserBackgrounds + m_data->gUserSettings.backgroundDirPath + std::string("/fcounter.png"));
+	m_data->imgChain = m_data->front->loadImage(m_baseAssetDir + kFolderUserBackgrounds + m_data->gUserSettings.backgroundDirPath + std::string("/chain.png"));
 	m_data->imgCharHolder = m_data->front->loadImage(m_baseAssetDir + "Data/CharSelect/charHolder.png");
 	m_data->imgNameHolder = m_data->front->loadImage(m_baseAssetDir + "Data/CharSelect/nameHolder.png");
 	m_data->imgBlack = m_data->front->loadImage(m_baseAssetDir + "Data/CharSelect/black.png");
 	m_data->imgDropSet = m_data->front->loadImage(m_baseAssetDir + "Data/CharSelect/dropset.png");
-	m_data->imgChain = m_data->front->loadImage(m_baseAssetDir + std::string("User/Backgrounds/") + m_data->gUserSettings.backgroundDirPath + std::string("/chain.png"));
 	m_data->imgCheckMark = m_data->front->loadImage(m_baseAssetDir + "Data/checkmark.png");
 	m_data->imgPlayerCharSelect = m_data->front->loadImage(m_baseAssetDir + "Data/CharSelect/charSelect.png");
 
 	for (int i = 0; i < kNumCharacters; ++i) {
-		m_data->imgCharField[i] = m_data->front->loadImage(m_baseAssetDir + kFolderUserCharacter + m_settings->characterSetup[static_cast<PuyoCharacter>(i)] + "/field.png");
-		m_data->imgCharSelect[i] = m_data->front->loadImage(m_baseAssetDir + kFolderUserCharacter + m_settings->characterSetup[static_cast<PuyoCharacter>(i)] + "/select.png");
-		m_data->imgCharName[i] = m_data->front->loadImage(m_baseAssetDir + kFolderUserCharacter + m_settings->characterSetup[static_cast<PuyoCharacter>(i)] + "/name.png");
-		m_data->imgSelect[i] = m_data->front->loadImage(m_baseAssetDir + kFolderUserCharacter + m_settings->characterSetup[static_cast<PuyoCharacter>(i)] + "/select.png");
+		loadCharacterImages(i, m_baseAssetDir + kFolderUserCharacter + m_settings->characterSetup[static_cast<PuyoCharacter>(i)]);
 	}
 
 	m_data->imgPlayerNumber = m_data->front->loadImage(m_baseAssetDir + "Data/CharSelect/playernumber.png");
 }
-
+void Game::loadCharacterImages(int i, const std::string& full_path) const
+{
+	m_data->imgCharField[i] = m_data->front->loadImage(full_path + "/field.png");
+	m_data->imgCharSelect[i] = m_data->front->loadImage(full_path + "/select.png");
+	m_data->imgCharName[i] = m_data->front->loadImage(full_path + "/name.png");
+	m_data->imgSelect[i] = m_data->front->loadImage(full_path + "/select.png");
+}
 void Game::initPlayers()
 {
 	// Create players according to settings
