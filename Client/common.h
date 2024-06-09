@@ -18,6 +18,8 @@
 // User agent
 #define PUYOVS_USER_AGENT "Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko"
 
+const QString kUserFolderBundles = "Bundles";
+
 namespace ppvs {
 enum class Rules : int;
 struct RuleSetInfo;

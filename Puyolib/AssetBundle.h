@@ -123,6 +123,8 @@ public:
 	std::string puyo;
 	std::string sfx;
 	std::map<PuyoCharacter, std::string> characterSetup;
+	bool is_valid = false; // whether it should be actually loaded
+	int reason = 0;
 };
 
 // The Token-filename translator converts tokens and transforms them into legacy filenames

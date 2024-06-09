@@ -34,10 +34,10 @@ add_library(Puyolib
     AssetManager.cpp
     AssetManager.h
     AssetBundle.cpp
-    AssetBundle.h)
+    AssetBundle.h ZIPArchiveBundle.cpp ZIPArchiveBundle.h)
 
 target_compile_features(Puyolib PUBLIC cxx_std_17)
 
-target_link_libraries(Puyolib ZLIB::ZLIB)
+target_link_libraries(Puyolib ZLIB::ZLIB MiniZip::MiniZip)
 
 add_library(Puyolib::Puyolib ALIAS Puyolib)

@@ -72,6 +72,7 @@ endif()
 set(OPT_DEF_LIBC ON)
 
 include(ThirdParty/zlib-ng/config.cmake)
+include(ThirdParty/minizip-ng/config.cmake)
 include(ThirdParty/glm/config.cmake)
 include(ThirdParty/jsoncpp/config.cmake)
 include(ThirdParty/libspng/config.cmake)

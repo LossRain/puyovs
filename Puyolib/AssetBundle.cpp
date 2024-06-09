@@ -19,6 +19,7 @@ GameAssetSettings::GameAssetSettings(ppvs::GameSettings* gs)
 	puyo = gs->puyo;
 	sfx = gs->sfx;
 	characterSetup = gs->characterSetup;
+	is_valid = true;
 }
 
 TokenFnTranslator::TokenFnTranslator(ppvs::GameAssetSettings* aS)

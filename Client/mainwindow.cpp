@@ -1025,11 +1025,101 @@ ppvs::AssetBundle* MainWindow::generateDefaultBundle()
 	return new ppvs::FolderAssetBundle(nullptr, assetSettings);
 }
 
+// FIXME: This is ugly but is about all that QDir supports
+QDir create_temp_folder()
+{
+	auto tmp = QDir::temp();
+	tmp.cd("PuyoVS");
+	return tmp;
+}
+
+std::list<ppvs::AssetBundle*> MainWindow::generateZIPBundles(const QString& location)
+{
+	Settings& settings = pvsApp->settings();
+	std::list<ppvs::AssetBundle*> bundles;
+	return bundles;
+	QDir tmp_location = create_temp_folder();
+	if (not tmp_location.exists() && not QDir::temp().mkdir("PuyoVS")) {
+		// We cannot extract to TEMP, no point creating any bundles
+		return bundles;
+	}
+	tmp_location = QDir(tmp_location.path() + QDir::separator() + "PuyoVS");
+
+	// List all files in the directory
+	QStringList valid_bundle_ext = { "*.zip", "*.ZIP" };
+	foreach (QString fn, QDir(location).entryList(valid_bundle_ext, QDir::Files)) {
+		auto* assetSettings = new ppvs::GameAssetSettings();
+		assetSettings->background = "Forest";
+		assetSettings->puyo = "Default";
+		assetSettings->sfx = "Default";
+		QStringList characters(settings.charMap());
+		for (int i = 0; i < characters.count(); i++) {
+			auto ch = ppvs::PuyoCharacter(i);
+			assetSettings->characterSetup[ch] = "";
+		}
+		// This has to be run before - alters the assetSettings
+		auto* new_bundle = new ppvs::ZIPArchiveBundle(nullptr, fn.toStdString(), tmp_location.path().toStdString(), assetSettings);
+		if (assetSettings->is_valid) {
+			bundles.push_back((ppvs::AssetBundle*)new_bundle);
+		}
+	}
+	return bundles;
+}
+
+std::list<ppvs::AssetBundle*> MainWindow::generateDefaultZIPBundles()
+{
+	Settings& settings = pvsApp->settings();
+	std::list<ppvs::AssetBundle*> bundles;
+	QDir tmp_location = QDir(QDir::temp().path());
+	if (not tmp_location.exists() && not QDir::temp().mkdir("PuyoVS")) {
+		// We cannot extract to TEMP, no point creating any bundles
+		return bundles;
+	}
+	tmp_location = QDir(tmp_location.path() + QDir::separator() + "PuyoVS");
+	assert(tmp_location.path().endsWith("PuyoVS"));
+
+	// List all files in the directory
+	QStringList valid_bundle_ext = { "*.zip", "*.ZIP" };
+	QDir default_path = QDir(defaultAssetPath);
+	default_path.cd(kUserFolderBundles);
+
+	foreach (QString fn, default_path.entryList(valid_bundle_ext, QDir::Files)) {
+		std::string bundle_path = (default_path.path() + QDir::separator() + fn).toStdString();
+		qDebug() << "unpacking " << bundle_path.c_str();
+		auto* assetSettings = new ppvs::GameAssetSettings();
+		assetSettings->background = settings.string("custom", "background", "Forest").toUtf8().data();
+		assetSettings->puyo = settings.string("custom", "puyo", "Default").toUtf8().data();
+		assetSettings->sfx = settings.string("custom", "sound", "Default").toUtf8().data();
+		QStringList characters(settings.charMap());
+		for (int i = 0; i < characters.count(); i++) {
+			auto ch = ppvs::PuyoCharacter(i);
+			assetSettings->characterSetup[ch] = characters.at(i).toStdString();
+		}
+
+		// This has to be run before - alters the assetSettings
+		auto* new_bundle = new ppvs::ZIPArchiveBundle(nullptr, bundle_path, tmp_location.path().toStdString(), assetSettings);
+		if (assetSettings->is_valid and not assetSettings->reason) {
+			qDebug() << "Added bundle at " << QString(new_bundle->get_folder().c_str());
+			bundles.push_back((ppvs::AssetBundle*)new_bundle);
+		} else {
+			qDebug() << "Bundle failed reason " << assetSettings->reason;
+		}
+	}
+	return bundles;
+}
+
 void MainWindow::initAssetManagerTemplate()
 {
 	// TODO: solve the "/./" in file paths problems
 	assetManagerTemplate->loadBundle(generateFolderBundle("")); // Standard
 	assetManagerTemplate->loadBundle(generateDefaultBundle()); // Emergency in case of a broken installation
+	for (auto* bundle : generateZIPBundles(kUserFolderBundles)) {
+		assetManagerTemplate->loadBundle(bundle);
+	}
+	for (auto* bundle : generateDefaultZIPBundles()) {
+		assetManagerTemplate->loadBundle(bundle);
+	}
+
 	assetManagerTemplate->init(); // Allow others interact with the object
 }
 

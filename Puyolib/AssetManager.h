@@ -4,6 +4,7 @@
 #pragma once
 #include "Animation.h"
 #include "AssetBundle.h"
+#include "ZIPArchiveBundle.h"
 #include "DebugLog.h"
 #include "Frontend.h"
 #include "GameSettings.h"

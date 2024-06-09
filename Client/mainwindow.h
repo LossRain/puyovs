@@ -59,6 +59,10 @@ public:
 	static ppvs::AssetBundle* generateFolderBundle(const QString& base_path);
 	// Generates bundle with only default assets
 	static ppvs::AssetBundle* generateDefaultBundle();
+	// Generates ZIP bundles
+	static std::list<ppvs::AssetBundle*> generateZIPBundles(const QString& location);
+	// Generates ZIP bundles with default settings in default location
+	static std::list<ppvs::AssetBundle*> generateDefaultZIPBundles();
 	void initAssetManagerTemplate();
 
 

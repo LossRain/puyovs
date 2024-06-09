@@ -16,3 +16,6 @@
 [submodule "ThirdParty/jsoncpp/jsoncpp"]
 	path = ThirdParty/jsoncpp/jsoncpp
 	url = https://github.com/open-source-parsers/jsoncpp.git
+[submodule "ThirdParty/minizip-ng/minizip-ng"]
+	path = ThirdParty/minizip-ng/minizip-ng
+	url = https://github.com/zlib-ng/minizip-ng
