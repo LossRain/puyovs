@@ -1,5 +1,6 @@
 #include <QCloseEvent>
 #include <QCryptographicHash>
+#include <QDebug>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPointer>
@@ -995,7 +996,6 @@ ppvs::AssetBundle* MainWindow::generateFolderBundle(const QString& base_path)
 {
 	Settings& settings = pvsApp->settings(); // We need this to access settings
 	auto* assetSettings = new ppvs::GameAssetSettings();
-
 	assetSettings->baseAssetDir = base_path.toStdString();
 	assetSettings->background = settings.string("custom", "background", "Forest").toUtf8().data();
 	assetSettings->puyo = settings.string("custom", "puyo", "Default").toUtf8().data();

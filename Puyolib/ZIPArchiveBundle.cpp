@@ -26,7 +26,7 @@ ZipArchive::~ZipArchive()
 // FIXME: Implement bytestream-based import of all assets on all clients and replace this potential nightmare with handling bytestream
 GameAssetSettings* extract_archive(const std::string& archive_fn, const std::string& extract_location, GameAssetSettings* gas)
 {
-	// The name of the subfolder we will extract to
+	// The name of the sub-folder we will extract to
 	std::string bundle_name = std::filesystem::path(archive_fn.c_str()).stem();
 	// The path to which we will extract this bundle
 	std::filesystem::path extract_folder = std::filesystem::path(extract_location.c_str()) / bundle_name;

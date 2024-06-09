@@ -142,11 +142,10 @@ public:
 	std::string token2fn(ImageToken token, const std::string& custom = "");
 	std::string token2fn(AnimationToken token, const std::string& custom = "");
 	// For character-specific tokens
-	std::string token2fn(const std::string& token,  PuyoCharacter character);
+	std::string token2fn(const std::string& token, PuyoCharacter character);
 	std::string token2fn(SoundEffectToken token, PuyoCharacter character);
 	std::string token2fn(ImageToken token, PuyoCharacter character);
 	std::string token2fn(AnimationToken token, PuyoCharacter character);
-
 
 	DebugLog* m_debug {};
 
@@ -345,9 +344,11 @@ public:
 	void reload() override;
 	void reload(Frontend* fe) override;
 
+protected:
+	GameAssetSettings* m_settings {};
+
 private:
 	TokenFnTranslator* m_translator {};
-	GameAssetSettings* m_settings {};
 };
 
 } // ppvs
